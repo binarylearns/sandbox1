@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Typing · Time Bar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .letter-correct {
+            @apply text-emerald-600 font-medium bg-emerald-50/40 rounded-sm px-[1px];
+        }
+        .letter-incorrect {
+            @apply text-rose-600 bg-rose-50/70 rounded-sm px-[1px] line-through decoration-rose-300;
+        }
+        .letter-pending {
+            @apply text-slate-600;
+        }
+        .letter-current {
+            @apply bg-indigo-100 rounded-sm px-[1px] ring-1 ring-indigo-300;
+        }
+
+        /* Progress bar animation */
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .progress-bar-animated {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899, #f59e0b, #6366f1);
+            background-size: 200% 100%;
+            animation: shimmer 2s linear infinite;
+        }
+        .progress-bar-warn {
+            background: linear-gradient(90deg, #f59e0b, #f97316, #ef4444, #f59e0b);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s linear infinite;
+        }
+        .progress-bar-danger {
+            background: linear-gradient(90deg, #ef4444, #dc2626, #b91c1c, #ef4444);
+            background-size: 200% 100%;
+            animation: shimmer 1s linear infinite;
+        }
+        .progress-bar-complete {
+            background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7, #10b981);
+            background-size: 200% 100%;
+            animation: shimmer 2s linear infinite;
+        }
+        /* pulse ring on timer when near end */
+        @keyframes pulse-ring {
+            0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70%  { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .timer-pulse {
+            animation: pulse-ring 1s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-4 antialiased font-sans">
+
+    <div class="w-full max-w-3xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200/80 p-6 sm:p-8 transition-all">
+
+        <!-- header -->
+        <div class="flex items-center gap-3 mb-5">
+            <div class="h-8 w-1.5 bg-gradient-to-b from-indigo-400 to-indigo-600 rounded-full"></div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-800">
+                English <span class="text-indigo-600">Typing</span>
+            </h1>
+            <span class="ml-auto text-xs font-mono uppercase px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 tracking-wider">test</span>
+        </div>
+
+        <!-- ====== TIME PROGRESS BAR ====== -->
+        <div class="mb-5">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <svg id="timerIcon" class="w-5 h-5 text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="text-sm font-semibold text-slate-700">Time Progress</span>
+                    <span id="targetTimeBadge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
+                        target: 60s
+                    </span>
+                </div>
+                <div class="flex items-baseline gap-1">
+                    <span id="barTimer" class="text-2xl font-bold font-mono text-slate-800 tabular-nums">0.0</span>
+                    <span class="text-xs text-slate-400 font-mono">/ 60s</span>
+                </div>
+            </div>
+
+            <!-- the bar -->
+            <div class="relative h-4 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-200/70">
+                <!-- fill -->
+                <div id="timeBarFill"
+                     class="progress-bar-animated h-full w-0 rounded-full transition-[width] duration-200 ease-linear relative">
+                    <!-- subtle top gloss -->
+                    <div class="absolute inset-x-0 top-0 h-1/2 bg-white/20 rounded-t-full"></div>
+                </div>
+
+                <!-- milestone tick marks -->
+                <div class="absolute inset-0 flex justify-between px-0 pointer-events-none">
+                    <div class="w-px h-full bg-white/60"></div>
+                    <div class="w-px h-full bg-white/60"></div>
+                    <div class="w-px h-full bg-white/60"></div>
+                    <div class="w-px h-full bg-white/60"></div>
+                    <div class="w-px h-full bg-white/60"></div>
+                </div>
+            </div>
+
+            <!-- status text under the bar -->
+            <div class="flex items-center justify-between mt-1.5">
+                <span id="barStatus" class="text-[11px] font-medium text-slate-400 tracking-wide">ready — start typing to begin</span>
+                <span id="barPercent" class="text-[11px] font-mono text-slate-400">0%</span>
+            </div>
+        </div>
+
+        <!-- target text -->
+        <p id="targetText" 
+           class="text-lg sm:text-xl leading-relaxed font-mono bg-slate-50/80 border border-slate-200/80 rounded-xl p-4 sm:p-5 text-slate-700 shadow-inner transition-colors min-h-[5rem]">
+        </p>
+
+        <!-- textarea -->
+        <textarea id="typingInput" rows="4"
+            class="mt-5 w-full p-4 sm:p-5 font-mono text-base sm:text-lg bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100/60 outline-none transition-all resize-none placeholder:text-slate-300 text-slate-700 shadow-sm disabled:opacity-60 disabled:bg-slate-50"
+            placeholder="Start typing here..." autofocus></textarea>
+
+        <!-- stats row -->
+        <div class="mt-5 flex flex-wrap items-center gap-6 sm:gap-10 text-sm font-medium bg-slate-50/70 px-4 py-3 rounded-xl border border-slate-200/60">
+            <div class="flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-slate-500">Time:</span>
+                <strong id="timer" class="font-mono text-slate-800 text-base">0</strong>
+                <span class="text-slate-400 text-xs">s</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span class="text-slate-500">WPM:</span>
+                <strong id="wpm" class="font-mono text-slate-800 text-base">0</strong>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-slate-500">Accuracy:</span>
+                <strong id="accuracy" class="font-mono text-slate-800 text-base">100</strong>
+                <span class="text-slate-400 text-xs">%</span>
+            </div>
+        </div>
+
+        <!-- buttons -->
+        <div class="mt-6 flex flex-wrap justify-end gap-3">
+            <button id="stopBtn"
+                class="group inline-flex items-center gap-2 px-5 py-3 bg-rose-50 border border-rose-200 rounded-xl shadow-sm hover:shadow-md hover:bg-rose-100 active:scale-[0.98] transition-all duration-150 text-rose-600 font-medium text-sm tracking-wide disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-rose-50"
+                disabled>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                </svg>
+                Stop
+            </button>
+
+            <button id="restart"
+                class="group inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-200 active:scale-[0.98] transition-all duration-150 text-slate-700 hover:text-indigo-600 font-medium text-sm tracking-wide">
+                <svg class="w-4 h-4 transition-transform group-hover:rotate-[-20deg]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                New Paragraph
+            </button>
+        </div>
+
+        <p class="mt-4 text-[11px] text-slate-400 text-center tracking-wide">
+            timer starts on first key — click <span class="text-rose-500 font-medium">Stop</span> when done
+        </p>
+    </div>
+
+    <script>
+        (function() {
+            // --- DOM elements ---
+            const targetTextEl = document.getElementById('targetText');
+            const typingInput = document.getElementById('typingInput');
+            const timerEl = document.getElementById('timer');
+            const wpmEl = document.getElementById('wpm');
+            const accuracyEl = document.getElementById('accuracy');
+            const restartBtn = document.getElementById('restart');
+            const stopBtn = document.getElementById('stopBtn');
+
+            // time bar elements
+            const timeBarFill = document.getElementById('timeBarFill');
+            const barTimer = document.getElementById('barTimer');
+            const barPercent = document.getElementById('barPercent');
+            const barStatus = document.getElementById('barStatus');
+            const timerIcon = document.getElementById('timerIcon');
+
+            // --- config ---
+            const TARGET_SECONDS = 60; // the "goal" time — bar fills up to this
+
+            // --- random paragraph pool ---
+            const paragraphs = [
+                "The quick brown fox jumps over the lazy dog while the sun sets behind the distant mountains, casting a warm golden glow across the quiet valley.",
+                "Programming is the art of telling another human being what one wants the computer to do, and doing it in a way that is both elegant and efficient.",
+                "In the middle of every difficulty lies opportunity, and the person who learns to embrace challenges will always find a way to grow beyond their limits.",
+                "A journey of a thousand miles begins with a single step, but it is the consistent small steps taken every day that ultimately lead to remarkable achievements.",
+                "The ocean whispers secrets to the shore, telling stories of ancient voyages and forgotten treasures buried beneath the waves for centuries untold.",
+                "Technology is best when it brings people together, connecting distant hearts and minds in ways that were once only imaginable in the realm of science fiction.",
+                "Nature has a way of healing the weary soul, offering peace in the rustle of leaves, the song of birds, and the gentle kiss of morning sunlight.",
+                "Success is not final, failure is not fatal, it is the courage to continue that truly matters on the long and winding road toward our dreams.",
+                "Books are the quietest and most constant of friends; they are the most accessible and wisest of counselors, and the most patient of teachers.",
+                "The stars are the streetlights of eternity, guiding lost travelers home across the vast and mysterious expanse of the endless cosmic sea."
+            ];
+
+            let originalTarget = "";
+            let startTime = null;
+            let timerInterval = null;
+            let isActive = false;
+            let isStopped = false;
+            let currentWPM = 0;
+            let currentAccuracy = 100;
+
+            function getRandomParagraph() {
+                const idx = Math.floor(Math.random() * paragraphs.length);
+                return paragraphs[idx];
+            }
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                return text.replace(/[&<>"']/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    if (m === '"') return '&quot;';
+                    if (m === "'") return '&#039;';
+                    return m;
+                });
+            }
+
+            // --- render target with coloring ---
+            function renderTargetFromInput() {
+                const typed = typingInput.value;
+                const target = originalTarget;
+
+                let html = '';
+                const maxLen = Math.max(target.length, typed.length);
+
+                for (let i = 0; i < maxLen; i++) {
+                    const targetChar = i < target.length ? target[i] : '';
+                    const typedChar = i < typed.length ? typed[i] : null;
+                    const isCurrent = (i === typed.length && !isStopped);
+
+                    if (i >= target.length) {
+                        if (typedChar !== null) {
+                            html += `<span class="letter-incorrect">${escapeHtml(typedChar)}</span>`;
+                        }
+                        continue;
+                    }
+
+                    if (typedChar === null) {
+                        if (isCurrent && !isStopped) {
+                            html += `<span class="letter-current letter-pending">${escapeHtml(targetChar)}</span>`;
+                        } else {
+                            html += `<span class="letter-pending">${escapeHtml(targetChar)}</span>`;
+                        }
+                    } else if (typedChar === targetChar) {
+                        html += `<span class="letter-correct">${escapeHtml(targetChar)}</span>`;
+                    } else {
+                        html += `<span class="letter-incorrect">${escapeHtml(targetChar)}</span>`;
+                    }
+                }
+
+                targetTextEl.innerHTML = html;
+            }
+
+            // --- update the time bar ---
+            function updateTimeBar(elapsedSeconds) {
+                // clamp 0..TARGET_SECONDS
+                const ratio = Math.min(elapsedSeconds / TARGET_SECONDS, 1);
+                const percent = ratio * 100;
+
+                // width fill
+                timeBarFill.style.width = percent + '%';
+
+                // big number
+                barTimer.textContent = elapsedSeconds < 10 ? elapsedSeconds.toFixed(1) : Math.round(elapsedSeconds);
+
+                // percent label
+                barPercent.textContent = Math.round(percent) + '%';
+
+                // color-class + icon color transitions
+                timeBarFill.classList.remove(
+                    'progress-bar-animated',
+                    'progress-bar-warn',
+                    'progress-bar-danger',
+                    'progress-bar-complete'
+                );
+
+                if (ratio < 0.5) {
+                    timeBarFill.classList.add('progress-bar-animated');
+                    timerIcon.classList.remove('text-amber-500','text-rose-500','text-emerald-500');
+                    timerIcon.classList.add('text-indigo-500');
+                } else if (ratio < 0.8) {
+                    timeBarFill.classList.add('progress-bar-warn');
+                    timerIcon.classList.remove('text-indigo-500','text-rose-500','text-emerald-500');
+                    timerIcon.classList.add('text-amber-500');
+                } else if (ratio < 1) {
+                    timeBarFill.classList.add('progress-bar-danger');
+                    timerIcon.classList.remove('text-indigo-500','text-amber-500','text-emerald-500');
+                    timerIcon.classList.add('text-rose-500');
+                } else {
+                    timeBarFill.classList.add('progress-bar-complete');
+                    timerIcon.classList.remove('text-indigo-500','text-amber-500','text-rose-500');
+                    timerIcon.classList.add('text-emerald-500');
+                }
+
+                // status text
+                if (isStopped) {
+                    barStatus.textContent = `stopped at ${elapsedSeconds.toFixed(1)}s`;
+                    barStatus.className = 'text-[11px] font-medium text-rose-500 tracking-wide';
+                } else if (!isActive && elapsedSeconds === 0) {
+                    barStatus.textContent = 'ready — start typing to begin';
+                    barStatus.className = 'text-[11px] font-medium text-slate-400 tracking-wide';
+                } else if (ratio >= 1) {
+                    barStatus.textContent = '🎯 target time reached — keep going or stop';
+                    barStatus.className = 'text-[11px] font-medium text-emerald-600 tracking-wide';
+                } else if (ratio >= 0.8) {
+                    barStatus.textContent = '🔥 almost there — keep the pace!';
+                    barStatus.className = 'text-[11px] font-medium text-rose-500 tracking-wide';
+                } else if (ratio >= 0.5) {
+                    barStatus.textContent = '⚡ halfway — nice rhythm';
+                    barStatus.className = 'text-[11px] font-medium text-amber-600 tracking-wide';
+                } else {
+                    barStatus.textContent = '🚀 you\'re going — keep typing';
+                    barStatus.className = 'text-[11px] font-medium text-indigo-500 tracking-wide';
+                }
+            }
+
+            // --- update stats ---
+            function updateStats() {
+                const typed = typingInput.value;
+                const target = originalTarget;
+
+                let elapsedSeconds = 0;
+                if (startTime) {
+                    elapsedSeconds = (Date.now() - startTime) / 1000;
+                }
+                const displayTime = elapsedSeconds < 10 ? elapsedSeconds.toFixed(1) : Math.round(elapsedSeconds);
+                timerEl.textContent = displayTime;
+
+                // WPM
+                let wpm = 0;
+                if (elapsedSeconds > 0) {
+                    const minutes = elapsedSeconds / 60;
+                    wpm = Math.round((typed.length / 5) / minutes);
+                }
+                wpm = isFinite(wpm) && !isNaN(wpm) ? wpm : 0;
+                currentWPM = wpm;
+                wpmEl.textContent = wpm;
+
+                // accuracy
+                let correctCount = 0;
+                const minLength = Math.min(typed.length, target.length);
+                for (let i = 0; i < minLength; i++) {
+                    if (typed[i] === target[i]) correctCount++;
+                }
+                const totalTyped = typed.length;
+                let accuracy = 100;
+                if (totalTyped > 0) {
+                    accuracy = Math.round((correctCount / totalTyped) * 100);
+                }
+                accuracy = Math.min(100, Math.max(0, accuracy));
+                currentAccuracy = accuracy;
+                accuracyEl.textContent = accuracy;
+
+                // update bar
+                updateTimeBar(elapsedSeconds);
+
+                // update target coloring
+                renderTargetFromInput();
+            }
+
+            // --- timer controls ---
+            function startTimerIfNeeded() {
+                if (isStopped) return;
+                if (!isActive && typingInput.value.length > 0) {
+                    isActive = true;
+                    startTime = Date.now();
+                    if (timerInterval) clearInterval(timerInterval);
+                    timerInterval = setInterval(() => {
+                        if (isActive && !isStopped) {
+                            updateStats();
+                        }
+                    }, 100);
+                    stopBtn.disabled = false;
+                }
+            }
+
+            function stopTimer() {
+                if (!isActive || isStopped) return;
+
+                isActive = false;
+                isStopped = true;
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+
+                // freeze final stats
+                updateStats();
+
+                // input locked
+                typingInput.disabled = true;
+                stopBtn.disabled = true;
+                typingInput.blur();
+            }
+
+            function resetTest(newParagraph = true) {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                isActive = false;
+                isStopped = false;
+                startTime = null;
+
+                if (newParagraph) {
+                    originalTarget = getRandomParagraph();
+                }
+
+                typingInput.value = '';
+                typingInput.disabled = false;
+
+                // reset numeric stats
+                timerEl.textContent = '0';
+                wpmEl.textContent = '0';
+                accuracyEl.textContent = '100';
+                currentWPM = 0;
+                currentAccuracy = 100;
+
+                // reset time bar
+                timeBarFill.style.width = '0%';
+                barTimer.textContent = '0.0';
+                barPercent.textContent = '0%';
+                barStatus.textContent = 'ready — start typing to begin';
+                barStatus.className = 'text-[11px] font-medium text-slate-400 tracking-wide';
+                timeBarFill.classList.remove('progress-bar-warn','progress-bar-danger','progress-bar-complete');
+                timeBarFill.classList.add('progress-bar-animated');
+                timerIcon.classList.remove('text-amber-500','text-rose-500','text-emerald-500');
+                timerIcon.classList.add('text-indigo-500');
+
+                // button states
+                stopBtn.disabled = true;
+
+                // render target pending
+                let initialHtml = '';
+                for (let i = 0; i < originalTarget.length; i++) {
+                    const ch = originalTarget[i];
+                    if (i === 0 && !isStopped) {
+                        initialHtml += `<span class="letter-current letter-pending">${escapeHtml(ch)}</span>`;
+                    } else {
+                        initialHtml += `<span class="letter-pending">${escapeHtml(ch)}</span>`;
+                    }
+                }
+                targetTextEl.innerHTML = initialHtml;
+
+                typingInput.focus();
+            }
+
+            // --- event listeners ---
+            typingInput.addEventListener('input', function() {
+                if (isStopped) return;
+                startTimerIfNeeded();
+                updateStats();
+            });
+
+            typingInput.addEventListener('keydown', function(e) {
+                if (isStopped) e.preventDefault();
+            });
+
+            typingInput.addEventListener('paste', function(e) {
+                if (isStopped) {
+                    e.preventDefault();
+                    return;
+                }
+                setTimeout(() => {
+                    startTimerIfNeeded();
+                    updateStats();
+                }, 10);
+            });
+
+            stopBtn.addEventListener('click', stopTimer);
+            restartBtn.addEventListener('click', () => resetTest(true));
+
+            // initialize
+            window.addEventListener('load', function() {
+                originalTarget = getRandomParagraph();
+                resetTest(false);
+            });
+        })();
+    </script>
+</body>
+</html>

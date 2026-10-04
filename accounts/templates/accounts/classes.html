@@ -1,0 +1,95 @@
+{% extends "accounts/sidebar.html" %}
+{% load static %}
+
+{% block title %}Lab Practical{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/01.css' %}">
+
+<div class="chapter-page">
+
+    <h1>Lab Practical</h1>
+    <p class="chapter-subtitle">
+        Class {{ student_profile.get_student_class_display }} · {{ student_profile.section|default:"All Sections" }}
+    </p>
+
+    <div class="chapter-grid">
+
+        <!-- 01 -->
+        <a href="#" class="chapter-card">
+            <span class="chapter-number">01</span>
+            <h2>Enter Your Lab Activity</h2>
+            <p>Start your practical session and log your work.</p>
+        </a>
+
+        <!-- 02 -->
+        <a href="#" class="chapter-card">
+            <span class="chapter-number">02</span>
+            <h2>Nepali Typing</h2>
+            <p>Practice typing in Nepali (Unicode) and improve speed.</p>
+        </a>
+
+ 
+        <!-- 03 -->
+        <a href="{% url 'english_typing' %}" class="activity-card">
+            <span class="chapter-number">03</span>
+            <h2>English Typing</h2>
+            <p>Practice typing in English, improve your accuracy, and build keyboard speed.</p>
+            <span class="activity-action">Start Practice →</span>
+        </a>
+
+
+
+        <!-- 04 -->
+        <a href="#" class="chapter-card">
+            <span class="chapter-number">04</span>
+            <h2>Play & Learn Games</h2>
+            <p>Fun typing games, puzzles, and memory challenges.</p>
+        </a>
+
+        <!-- 05 -->
+        <a href="#" class="chapter-card">
+            <span class="chapter-number">05</span>
+            <h2>Drawing & Creativity</h2>
+            <p>Paint, sketch, and create digital art.</p>
+        </a>
+
+        <!-- 06 -->
+        <a href="#" class="chapter-card">
+            <span class="chapter-number">06</span>
+            <h2>MS Paint Basics</h2>
+            <p>Learn shapes, colors, and simple drawing tools.</p>
+        </a>
+
+        <!-- 07 -->
+        <a href="#" class="chapter-card">
+            <span class="chapter-number">07</span>
+            <h2>Computer Basics</h2>
+            <p>Parts of a computer, mouse, keyboard, and more.</p>
+        </a>
+
+        <!-- 08 -->
+        <a href="#" class="chapter-card">
+            <span class="chapter-number">08</span>
+            <h2>Files & Folders</h2>
+            <p>Create, move, copy, and organize files.</p>
+        </a>
+
+        <!-- 09 -->
+        <a href="#" class="chapter-card">
+            <span class="chapter-number">09</span>
+            <h2>Internet Safety</h2>
+            <p>Learn how to explore the web safely.</p>
+        </a>
+
+        <!-- 10 -->
+        <a href="#" class="chapter-card">
+            <span class="chapter-number">10</span>
+            <h2>Fun Challenges</h2>
+            <p>Test what you've learned with quick challenges.</p>
+        </a>
+
+    </div>
+</div>
+
+{% endblock %}

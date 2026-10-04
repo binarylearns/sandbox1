@@ -1,0 +1,53 @@
+{% extends "accounts/sidebar.html" %}
+
+{% block title %}Profile · The Lab{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-5rem)] flex items-center justify-center">
+
+  <div class="w-full max-w-md">
+
+    {% if student_profile %}
+
+    <!-- Avatar + Name -->
+    <div class="text-center mb-10">
+      <div class="w-20 h-20 mx-auto rounded-full bg-black text-white flex items-center justify-center text-2xl font-medium mb-4">
+        {{ request.user.username|first|upper }}
+      </div>
+      <h1 class="text-xl font-semibold tracking-tight">
+        {{ student_profile.full_name }}
+      </h1>
+      <p class="text-sm text-gray-500 mt-1">@{{ request.user.username }}</p>
+    </div>
+
+    <!-- Info List -->
+    <div class="border-t border-gray-200">
+      <div class="flex justify-between py-3.5 border-b border-gray-200">
+        <span class="text-sm text-gray-500">Class</span>
+        <span class="text-sm font-medium">{{ student_profile.get_student_class_display }}</span>
+      </div>
+      <div class="flex justify-between py-3.5 border-b border-gray-200">
+        <span class="text-sm text-gray-500">Section</span>
+        <span class="text-sm font-medium">{{ student_profile.section }}</span>
+      </div>
+      <div class="flex justify-between py-3.5 border-b border-gray-200">
+        <span class="text-sm text-gray-500">School</span>
+        <span class="text-sm font-medium text-right">{{ student_profile.school }}</span>
+      </div>
+      <div class="flex justify-between py-3.5 border-b border-gray-200">
+        <span class="text-sm text-gray-500">Email</span>
+        <span class="text-sm font-medium truncate ml-4">{{ request.user.email }}</span>
+      </div>
+    </div>
+
+    {% else %}
+
+    <p class="text-center text-sm text-gray-500">
+      Your student profile has not been created yet.
+    </p>
+
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

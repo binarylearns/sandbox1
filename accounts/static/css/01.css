@@ -1,0 +1,263 @@
+/* =========================================
+   BASE
+========================================= */
+
+.chapter-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.chapter-page h1 {
+    margin: 0;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #000;
+}
+
+.chapter-subtitle {
+    margin: 10px 0 44px;
+    font-size: 15px;
+    color: #666;
+}
+
+
+/* =========================================
+   GRID
+========================================= */
+
+.chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #e5e5e5;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.chapter-card {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 28px 24px;
+    min-height: 160px;
+
+    background: #fff;
+
+    text-decoration: none;
+    color: #000;
+
+    transition: background 0.2s ease;
+}
+
+
+/* =========================================
+   UNLOCKED
+========================================= */
+
+.chapter-card:not(.locked) {
+    cursor: pointer;
+}
+
+.chapter-card:not(.locked):hover {
+    background: #000;
+    color: #fff;
+}
+
+.chapter-card:not(.locked):hover .chapter-number {
+    background: #fff;
+    color: #000;
+}
+
+.chapter-card:not(.locked):hover p {
+    color: #ccc;
+}
+
+
+/* =========================================
+   CHAPTER NUMBER
+========================================= */
+
+.chapter-number {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+
+    margin-bottom: 20px;
+
+    border: 1px solid currentColor;
+    border-radius: 50%;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+.chapter-card h2 {
+    margin: 0 0 8px;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    letter-spacing: -0.01em;
+}
+
+
+/* =========================================
+   DESCRIPTION
+========================================= */
+
+.chapter-card p {
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 1.5;
+
+    color: #666;
+
+    transition: color 0.2s ease;
+}
+
+
+/* =========================================
+   LOCKED
+========================================= */
+
+.chapter-card.locked {
+    background: #fafafa;
+    color: #999;
+
+    cursor: not-allowed;
+}
+
+
+/* Locked number */
+
+.chapter-card.locked .chapter-number {
+    color: #aaa;
+    border-color: #d5d5d5;
+}
+
+
+/* Locked title */
+
+.chapter-card.locked h2 {
+    color: #888;
+}
+
+
+/* Locked description */
+
+.chapter-card.locked p {
+    color: #aaa;
+}
+
+
+/* =========================================
+   LOCK ICON
+========================================= */
+
+.lock {
+    position: absolute;
+
+    top: 24px;
+    right: 24px;
+
+    display: block;
+
+    font-size: 20px;
+    line-height: 1;
+
+    color: #888;
+
+    z-index: 10;
+}
+
+
+/* =========================================
+   LOCKED HOVER
+========================================= */
+
+.chapter-card.locked:hover {
+    background: #fafafa;
+    color: #999;
+}
+
+.chapter-card.locked:hover .chapter-number {
+    background: transparent;
+    color: #aaa;
+}
+
+.chapter-card.locked:hover p {
+    color: #aaa;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 800px) {
+
+    .chapter-page {
+        padding: 50px 20px;
+    }
+
+    .chapter-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 520px) {
+
+    .chapter-page {
+        padding: 40px 16px;
+    }
+
+    .chapter-page h1 {
+        font-size: 28px;
+    }
+
+    .chapter-subtitle {
+        margin-bottom: 30px;
+    }
+
+    .chapter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chapter-card {
+        min-height: 160px;
+        padding: 24px 20px;
+    }
+
+    .lock {
+        top: 20px;
+        right: 20px;
+    }
+}
