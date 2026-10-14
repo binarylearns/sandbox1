@@ -4,92 +4,241 @@
 {% block title %}Lab Practical{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/01.css' %}">
 
-<div class="chapter-page">
+<style>
+  /* Fun kid-friendly animations */
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 
-    <h1>Lab Practical</h1>
-    <p class="chapter-subtitle">
-        Class {{ student_profile.get_student_class_display }} · {{ student_profile.section|default:"All Sections" }}
-    </p>
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-3deg); }
+    75% { transform: rotate(3deg); }
+  }
 
-    <div class="chapter-grid">
+  @keyframes shake-lock {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px) rotate(-2deg); }
+    75% { transform: translateX(2px) rotate(2deg); }
+  }
 
-        <!-- 01 -->
-        <a href="#" class="chapter-card">
-            <span class="chapter-number">01</span>
-            <h2>Enter Your Lab Activity</h2>
-            <p>Start your practical session and log your work.</p>
-        </a>
+  @keyframes bounce-soft {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
 
-        <!-- 02 -->
-        <a href="#" class="chapter-card">
-            <span class="chapter-number">02</span>
-            <h2>Nepali Typing</h2>
-            <p>Practice typing in Nepali (Unicode) and improve speed.</p>
-        </a>
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.6); }
+    70% { box-shadow: 0 0 0 14px rgba(59,130,246,0); }
+    100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+  }
 
- 
-        <!-- 03 -->
-        <a href="{% url 'english_typing' %}" class="activity-card">
-            <span class="chapter-number">03</span>
-            <h2>English Typing</h2>
-            <p>Practice typing in English, improve your accuracy, and build keyboard speed.</p>
-            <span class="activity-action">Start Practice →</span>
-        </a>
+  .card-unlocked {
+    animation: bounce-soft 3s ease-in-out infinite;
+  }
+  .card-unlocked:hover {
+    animation: wiggle 0.5s ease-in-out infinite;
+  }
 
+  .card-unlocked .number-badge {
+    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
+  .card-unlocked:hover .number-badge {
+    transform: rotate(360deg) scale(1.2);
+  }
 
+  .card-locked:hover {
+    animation: shake-lock 0.4s ease-in-out infinite;
+  }
 
-        <!-- 04 -->
-        <a href="#" class="chapter-card">
-            <span class="chapter-number">04</span>
-            <h2>Play & Learn Games</h2>
-            <p>Fun typing games, puzzles, and memory challenges.</p>
-        </a>
+  .card-locked:hover .lock-icon {
+    animation: spin-slow 1.5s linear infinite;
+  }
 
-        <!-- 05 -->
-        <a href="#" class="chapter-card">
-            <span class="chapter-number">05</span>
-            <h2>Drawing & Creativity</h2>
-            <p>Paint, sketch, and create digital art.</p>
-        </a>
+  .pulse-open {
+    animation: pulse-ring 2s infinite;
+  }
 
-        <!-- 06 -->
-        <a href="#" class="chapter-card">
-            <span class="chapter-number">06</span>
-            <h2>MS Paint Basics</h2>
-            <p>Learn shapes, colors, and simple drawing tools.</p>
-        </a>
+  .shadow-fun {
+    box-shadow:
+      0 8px 0 0 rgba(0,0,0,0.08),
+      0 12px 24px -6px rgba(59,130,246,0.35);
+  }
+  .shadow-fun-red {
+    box-shadow:
+      0 8px 0 0 rgba(0,0,0,0.08),
+      0 12px 24px -6px rgba(239,68,68,0.35);
+  }
+  .shadow-fun:hover {
+    box-shadow:
+      0 12px 0 0 rgba(0,0,0,0.1),
+      0 18px 32px -6px rgba(59,130,246,0.5);
+  }
+</style>
 
-        <!-- 07 -->
-        <a href="#" class="chapter-card">
-            <span class="chapter-number">07</span>
-            <h2>Computer Basics</h2>
-            <p>Parts of a computer, mouse, keyboard, and more.</p>
-        </a>
+<div class="min-h-screen bg-gradient-to-br from-blue-200 via-pink-100 to-red-200 py-12 px-4">
+  <div class="max-w-6xl mx-auto">
 
-        <!-- 08 -->
-        <a href="#" class="chapter-card">
-            <span class="chapter-number">08</span>
-            <h2>Files & Folders</h2>
-            <p>Create, move, copy, and organize files.</p>
-        </a>
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800 drop-shadow-sm">
+        <span class="text-red-500">Computer</span>
+        <span class="text-blue-600">Fundamentals</span>
+      </h1>
+      <p class="mt-3 text-lg text-gray-600 font-medium">🎉 Pick a chapter and start learning! 🎉</p>
+      <div class="mt-5 flex justify-center gap-1.5">
+        <span class="w-10 h-2 rounded-full bg-red-500"></span>
+        <span class="w-10 h-2 rounded-full bg-blue-600"></span>
+        <span class="w-10 h-2 rounded-full bg-red-500"></span>
+      </div>
+    </div>
 
-        <!-- 09 -->
-        <a href="#" class="chapter-card">
-            <span class="chapter-number">09</span>
-            <h2>Internet Safety</h2>
-            <p>Learn how to explore the web safely.</p>
-        </a>
+    <!-- Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
 
-        <!-- 10 -->
-        <a href="#" class="chapter-card">
-            <span class="chapter-number">10</span>
-            <h2>Fun Challenges</h2>
-            <p>Test what you've learned with quick challenges.</p>
-        </a>
+      <!-- 01 UNLOCKED -->
+      <a href="{% url 'english_typing' %}"
+         class="card-unlocked pulse-open group relative block bg-white rounded-3xl shadow-fun border-4 border-blue-400 hover:border-red-400 transition-colors duration-300 overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 via-blue-500 to-red-500"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="number-badge inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-red-500 text-white text-2xl font-extrabold shadow-md">
+              01
+            </span>
+            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-green-400 text-white shadow-sm">OPEN ✨</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-blue-700 mb-2">Computer Basics</h2>
+          <p class="text-sm text-gray-600 font-medium">Learn the fundamentals of computers.</p>
+          <div class="mt-4 flex items-center text-red-500 font-bold text-sm">
+            Let's go!
+            <svg class="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </div>
+      </a>
+
+      <!-- 02 LOCKED -->
+      <div class="card-locked relative bg-white rounded-3xl shadow-fun-red border-4 border-red-300 overflow-hidden cursor-not-allowed">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-blue-400"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-200 to-blue-200 text-white text-2xl font-extrabold">02</span>
+            <span class="lock-icon text-2xl">🔒</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-gray-500 mb-2">Operating System / Desktop Skills</h2>
+          <p class="text-sm text-gray-400 font-medium">Learn about computer hardware and devices.</p>
+        </div>
+      </div>
+
+      <!-- 03 LOCKED -->
+      <div class="card-locked relative bg-white rounded-3xl shadow-fun-red border-4 border-red-300 overflow-hidden cursor-not-allowed">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-blue-400"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-200 to-blue-200 text-white text-2xl font-extrabold">03</span>
+            <span class="lock-icon text-2xl">🔒</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-gray-500 mb-2">Operating System</h2>
+          <p class="text-sm text-gray-400 font-medium">Learn the basics of operating systems.</p>
+        </div>
+      </div>
+
+      <!-- 04 LOCKED -->
+      <div class="card-locked relative bg-white rounded-3xl shadow-fun-red border-4 border-red-300 overflow-hidden cursor-not-allowed">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-blue-400"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-200 to-blue-200 text-white text-2xl font-extrabold">04</span>
+            <span class="lock-icon text-2xl">🔒</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-gray-500 mb-2">Drawing + Creativity</h2>
+          <p class="text-sm text-gray-400 font-medium">Learn drawing and creative computer activities.</p>
+        </div>
+      </div>
+
+      <!-- 05 LOCKED -->
+      <div class="card-locked relative bg-white rounded-3xl shadow-fun-red border-4 border-red-300 overflow-hidden cursor-not-allowed">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-blue-400"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-200 to-blue-200 text-white text-2xl font-extrabold">05</span>
+            <span class="lock-icon text-2xl">🔒</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-gray-500 mb-2">Files &amp; Folders</h2>
+          <p class="text-sm text-gray-400 font-medium">Learn how to manage files and folders.</p>
+        </div>
+      </div>
+
+      <!-- 06 LOCKED -->
+      <div class="card-locked relative bg-white rounded-3xl shadow-fun-red border-4 border-red-300 overflow-hidden cursor-not-allowed">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-blue-400"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-200 to-blue-200 text-white text-2xl font-extrabold">06</span>
+            <span class="lock-icon text-2xl">🔒</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-gray-500 mb-2">Typing</h2>
+          <p class="text-sm text-gray-400 font-medium">Improve your keyboard and typing skills.</p>
+        </div>
+      </div>
+
+      <!-- 07 LOCKED -->
+      <div class="card-locked relative bg-white rounded-3xl shadow-fun-red border-4 border-red-300 overflow-hidden cursor-not-allowed">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-blue-400"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-200 to-blue-200 text-white text-2xl font-extrabold">07</span>
+            <span class="lock-icon text-2xl">🔒</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-gray-500 mb-2">Topic 7</h2>
+          <p class="text-sm text-gray-400 font-medium">This is topic 7.</p>
+        </div>
+      </div>
+
+      <!-- 08 LOCKED -->
+      <div class="card-locked relative bg-white rounded-3xl shadow-fun-red border-4 border-red-300 overflow-hidden cursor-not-allowed">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-blue-400"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-200 to-blue-200 text-white text-2xl font-extrabold">08</span>
+            <span class="lock-icon text-2xl">🔒</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-gray-500 mb-2">Topic 8</h2>
+          <p class="text-sm text-gray-400 font-medium">This is topic 8.</p>
+        </div>
+      </div>
+
+      <!-- 09 LOCKED -->
+      <div class="card-locked relative bg-white rounded-3xl shadow-fun-red border-4 border-red-300 overflow-hidden cursor-not-allowed">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-blue-400"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-200 to-blue-200 text-white text-2xl font-extrabold">09</span>
+            <span class="lock-icon text-2xl">🔒</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-gray-500 mb-2">Topic 9</h2>
+          <p class="text-sm text-gray-400 font-medium">This is topic 9.</p>
+        </div>
+      </div>
+
+      <!-- 10 LOCKED -->
+      <div class="card-locked relative bg-white rounded-3xl shadow-fun-red border-4 border-red-300 overflow-hidden cursor-not-allowed">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-blue-400"></div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-200 to-blue-200 text-white text-2xl font-extrabold">10</span>
+            <span class="lock-icon text-2xl">🔒</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-gray-500 mb-2">Topic 10</h2>
+          <p class="text-sm text-gray-400 font-medium">This is topic 10.</p>
+        </div>
+      </div>
 
     </div>
+  </div>
 </div>
 
 {% endblock %}

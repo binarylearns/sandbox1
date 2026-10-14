@@ -70,4 +70,4 @@ def lp(request):
 
 
 def english_typing(request):
-    return render(request, "accounts/english_typing.html")
+    return render(request, "accounts/subtopics/english_typing.html")

@@ -12,7 +12,7 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("classes/", views.classes, name="classes"),
     path("lab-practical/", views.lp, name="lab_practical"),
-    path("1st/", views.f1st, name="1stst"),
+    path("english_typing", views.english_typing, name="english_typing"),
 
     path("english_typing/", views.english_typing, name="english_typing"),
 
